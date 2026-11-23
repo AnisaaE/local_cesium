@@ -14,7 +14,7 @@
     <nav id="presentation" aria-labelledby="presentationTitle" hidden>
       <div class="presentation-header">
         <button id="presentationCollapse" type="button" aria-label="Свий стъпките" aria-expanded="true" aria-controls="presentationSteps">⌃</button>
-        <h1 id="presentationTitle">SOFIA DIGITAL TWIN</h1>
+        <h1 id="presentationTitle" class="panel-drag-handle" tabindex="0" title="Премести панела" aria-keyshortcuts="Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown">SOFIA DIGITAL TWIN</h1>
         <div class="presentation-actions">
           <button id="presentationPrevious" type="button" aria-label="Предишна стъпка" disabled>←</button>
           <button type="button" aria-label="Автоматично превъртане" disabled>▶</button>
@@ -26,22 +26,24 @@
     </nav>
     <p id="status" role="status">Зареждат се теренът и сградите на София…</p>
     <div id="slidePanels">
-      <aside id="slideInfo" aria-labelledby="slideInfoTitle" tabindex="0" hidden>
-        <h2 id="slideInfoTitle"></h2>
-        <div id="slideInfoContent"></div>
-        <div id="wrfChart" hidden>
-          <p id="wrfChartSample"></p>
-          <svg viewBox="0 0 340 164" role="img" aria-labelledby="wrfChartTitle">
-            <title id="wrfChartTitle">Hourly modeled air temperature at the sample point</title>
-            <path class="wrf-chart-grid" d="M42 14H328 M42 138H328" />
-            <text id="wrfChartMax" x="34" y="18" text-anchor="end"></text>
-            <text id="wrfChartMin" x="34" y="142" text-anchor="end"></text>
-            <text id="wrfChartStart" x="42" y="157"></text>
-            <text id="wrfChartEnd" x="328" y="157" text-anchor="end"></text>
-            <path id="wrfChartSeries" />
-            <line id="wrfChartCursor" x1="0" x2="0" y1="14" y2="138" />
-          </svg>
-          <p id="wrfChartTemperature"></p>
+      <aside id="slideInfo" aria-labelledby="slideInfoTitle" hidden>
+        <h2 id="slideInfoTitle" class="panel-drag-handle" tabindex="0" title="Премести панела" aria-keyshortcuts="Shift+ArrowLeft Shift+ArrowRight Shift+ArrowUp Shift+ArrowDown"></h2>
+        <div id="slideInfoBody" tabindex="0">
+          <div id="slideInfoContent"></div>
+          <div id="wrfChart" hidden>
+            <p id="wrfChartSample"></p>
+            <svg viewBox="0 0 340 164" role="img" aria-labelledby="wrfChartTitle">
+              <title id="wrfChartTitle">Hourly modeled air temperature at the sample point</title>
+              <path class="wrf-chart-grid" d="M42 14H328 M42 138H328" />
+              <text id="wrfChartMax" x="34" y="18" text-anchor="end"></text>
+              <text id="wrfChartMin" x="34" y="142" text-anchor="end"></text>
+              <text id="wrfChartStart" x="42" y="157"></text>
+              <text id="wrfChartEnd" x="328" y="157" text-anchor="end"></text>
+              <path id="wrfChartSeries" />
+              <line id="wrfChartCursor" x1="0" x2="0" y1="14" y2="138" />
+            </svg>
+            <p id="wrfChartTemperature"></p>
+          </div>
         </div>
       </aside>
       <section id="wrfTimePanel" aria-labelledby="wrfTitle" hidden>

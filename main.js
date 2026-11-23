@@ -1,5 +1,6 @@
 import { createLayers } from "./layers.js";
 import { showCameraDebug } from "./camera-debug.js";
+import { enablePanelDrag } from "./panel-drag.js";
 import { setupPresentation } from "./presentation.js";
 import { applySlide, slides } from "./slides.js";
 
@@ -200,6 +201,7 @@ async function start() {
   const legendContainer = document.getElementById("layerLegends");
   const slideInfo = document.getElementById("slideInfo");
   const slideInfoTitle = document.getElementById("slideInfoTitle");
+  const slideInfoBody = document.getElementById("slideInfoBody");
   const slideInfoContent = document.getElementById("slideInfoContent");
   let slideChange = 0;
 
@@ -243,7 +245,7 @@ async function start() {
     }
     slideInfoTitle.textContent = slide.title;
     slideInfoContent.replaceChildren(...content);
-    slideInfo.scrollTop = 0;
+    slideInfoBody.scrollTop = 0;
   }
 
   async function updateSlide(slide) {
@@ -265,6 +267,8 @@ async function start() {
     void updateSlide(slide);
     focusMap(slide);
   }, focusMap);
+  enablePanelDrag(document.getElementById("presentation"), document.getElementById("presentationTitle"));
+  enablePanelDrag(slideInfo, slideInfoTitle);
   const initialUpdate = updateSlide(initialSlide);
   if (initialSlide.cameraFlight) playCameraFlight(initialSlide);
   await initialUpdate;

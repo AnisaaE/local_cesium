@@ -74,12 +74,30 @@ body {
   pointer-events: auto;
 }
 
+.panel-drag-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.panel-drag-handle:focus-visible {
+  outline: 2px solid #9cebd5;
+  outline-offset: 2px;
+}
+
+.panel-dragging {
+  z-index: 3;
+}
+
+.panel-dragging .panel-drag-handle {
+  cursor: grabbing;
+}
+
 #slideInfo {
   width: min(23.25rem, 100%);
   max-height: 45vh;
   box-sizing: border-box;
-  overflow: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   margin-bottom: clamp(0rem, calc(12vh - 2.25rem), 4rem);
   padding: 0.8rem;
   border: 1px solid #44525e;
@@ -87,6 +105,23 @@ body {
   background: rgb(16 24 32 / 94%);
   box-shadow: 0 0.5rem 2rem rgb(4 10 16 / 35%);
   backdrop-filter: blur(12px);
+}
+
+#slideInfo:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+}
+
+#slideInfo.panel-moved {
+  position: fixed;
+  width: min(23.25rem, calc(100% - 1.5rem));
+  margin-bottom: 0;
+}
+
+#slideInfoBody {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 #slideInfo:has(+ #wrfTimePanel:not([hidden])) {
