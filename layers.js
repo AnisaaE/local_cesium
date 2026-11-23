@@ -3,7 +3,7 @@ import { cfdVelocityLegend, loadCfdPoints, loadGateBuilding } from "./gate-cfd.j
 import { createHeatingDemandLayer } from "./heating-demand.js";
 import { loadTemperature, temperatureLegend, temperatureTitle } from "./temperature.js";
 import { createWalkabilityLayer, createWalkAccessLayer, createWalkRasterProvider, educationLayers, loadEducationPoints, walkRasters } from "./walkability.js";
-import { createWrfLayer } from "./wrf.js";
+import { createTimeLayer } from "./time-layer.js";
 
 const labSensorsUrl =
   "https://services-eu1.arcgis.com/XYGfXK4rEYwaj5A0/arcgis/rest/services/LabSensors/FeatureServer";
@@ -73,7 +73,7 @@ export function createLayers(Cesium, viewer, buildings, layerOptions = {}) {
     },
     requestRender: () => viewer.scene.requestRender(),
   }));
-  layers.set("wrf-temperature", createWrfLayer(Cesium, viewer, layerOptions["wrf-temperature"]));
+  layers.set("time-layer", createTimeLayer(Cesium, viewer, layerOptions["time-layer"]));
   layers.set("trees", createSceneLayer({
     title: "Trees",
     load: () => Cesium.Cesium3DTileset.fromUrl(treesUrl),

@@ -31,15 +31,24 @@
         <div id="slideInfoBody" tabindex="0">
           <div id="slideInfoContent"></div>
           <div id="wrfChart" hidden>
+            <div class="time-chart-key">
+              <span class="time-chart-min">Raster min</span>
+              <span class="time-chart-mean">Raster mean</span>
+              <span class="time-chart-max">Raster max</span>
+              <span class="time-chart-point">Selected point</span>
+            </div>
             <p id="wrfChartSample"></p>
             <svg viewBox="0 0 340 164" role="img" aria-labelledby="wrfChartTitle">
-              <title id="wrfChartTitle">Hourly modeled air temperature at the sample point</title>
+              <title id="wrfChartTitle">Raster and selected location history</title>
               <path class="wrf-chart-grid" d="M42 14H328 M42 138H328" />
               <text id="wrfChartMax" x="34" y="18" text-anchor="end"></text>
               <text id="wrfChartMin" x="34" y="142" text-anchor="end"></text>
               <text id="wrfChartStart" x="42" y="157"></text>
               <text id="wrfChartEnd" x="328" y="157" text-anchor="end"></text>
-              <path id="wrfChartSeries" />
+              <path id="wrfChartMaximum" class="time-chart-series max" />
+              <path id="wrfChartMean" class="time-chart-series mean" />
+              <path id="wrfChartMinimum" class="time-chart-series min" />
+              <path id="wrfChartPoint" class="time-chart-series point" />
               <line id="wrfChartCursor" x1="0" x2="0" y1="14" y2="138" />
             </svg>
             <p id="wrfChartTemperature"></p>
@@ -48,12 +57,17 @@
       </aside>
       <section id="wrfTimePanel" aria-labelledby="wrfTitle" hidden>
         <div class="wrf-time-header">
-          <h2 id="wrfTitle">WRF 2024 · 2 m air temperature</h2>
+          <h2 id="wrfTitle">Time layer · summer land surface temperature</h2>
           <output id="wrfTimestamp" for="wrfHour"></output>
         </div>
+        <label class="wrf-dataset-label" for="wrfDataset">Time layer dataset</label>
+        <select id="wrfDataset" aria-label="Time layer dataset">
+          <option value="lst">Summer surface temperature</option>
+          <option value="wind">10 m wind speed (hourly)</option>
+        </select>
         <div class="wrf-time-controls">
           <button id="wrfPlay" type="button">Play</button>
-          <input id="wrfHour" type="range" min="0" max="0" step="1" value="0" aria-label="Час на прогнозата" />
+          <input id="wrfHour" type="range" min="0" max="0" step="1" value="0" aria-label="Summer year" />
         </div>
         <div id="wrfRamp" aria-hidden="true"></div>
         <div class="wrf-scale"><span id="wrfMin"></span><span id="wrfMax"></span></div>

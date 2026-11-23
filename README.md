@@ -7,7 +7,7 @@
 Отвори терминал в тази папка и стартирай локален сървър за статичните файлове. Например с Node.js:
 
 ```sh
-npx --yes serve . --listen 8080
+node server.mjs 8080
 ```
 
 Отвори [http://localhost:8080](http://localhost:8080). Нужна е интернет връзка за CesiumJS, базовата карта, терена и 3D сградите.
@@ -29,9 +29,9 @@ npx --yes serve . --listen 8080
 - `solar` е локален набор от 3D Tiles в `assets/solar/`, преобразуван от [оригиналния ArcGIS SceneServer](https://tiles-eu1.arcgis.com/XYGfXK4rEYwaj5A0/arcgis/rest/services/cc_5m_moved_7801_colored/SceneServer/layers/0). Запазени са RGB цветовете от източника. Височините са преобразувани от EGM96 към WGS84 с отместване +2 m. Cesium визуализира точките с размер 3 px.
 - Непрозрачността на температурната мрежа се задава чрез `layerOptions["temperature-prediction"].opacity` за втория слайд в `slides.js`. Началната стойност е `0.50`, а диапазонът е от `0` до `1`.
 
-## WRF почасови кадри
+## Time layer datasets
 
-Третата стъпка `?slide=wrf-temperature` зарежда `T2_C` от `assets/wrf/T2_C/manifest.json`. Плъзгачът избира един от 175-те часа между 14 юли 2024, 18:00 UTC и 22 юли 2024, 00:00 UTC. **Play** превърта часовете в цикъл. **Pause** задържа текущия кадър. Осветлението на сцената е независимо от избрания час.
+Третата стъпка `?slide=time-layer` пренася функционалността на `cesium_timebased`: от `Time layer dataset` се избира между `Summer surface temperature` (2016–2025) и `10 m wind speed` (почасовите WRF кадри). И двата режима имат Play/Pause, времеви плъзгач, цветова легенда, Raster min/mean/max история и избор на точка от картата за Selected point история. Готовите PNG tile cache файлове са локални в `assets/time-layer/cache/`, така че не са нужни QGIS, Conda или Python.
 
 Кадрите използват оригиналната EPSG:3857 решетка, пикселните граници от NetCDF, прозрачен NoData и фиксираната CIELAB скала от ArcGIS. Слайдът използва запазения изглед, подложката World Imagery и осветление на релефа с фиксирано дневно слънце. Браузърът зарежда готовите PNG кадри и не отваря оригиналния NetCDF.
 
