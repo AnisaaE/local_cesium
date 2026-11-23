@@ -1,0 +1,13 @@
+{
+  "name": "sofia-wrf-preprocessor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "culori": "4.0.2",
+    "h5wasm": "0.10.3",
+    "pngjs": "7.0.0"
+  }
+}

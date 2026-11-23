@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="bg">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>София в 3D</title>
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.133/Build/Cesium/Widgets/widgets.css" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="https://cesium.com/downloads/cesiumjs/releases/1.133/Build/Cesium/Cesium.js"></script>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <main id="cesiumContainer" aria-label="3D карта на София"></main>
+    <nav id="presentation" aria-labelledby="presentationTitle" hidden>
+      <div class="presentation-header">
+        <button id="presentationCollapse" type="button" aria-label="Свий стъпките" aria-expanded="true" aria-controls="presentationSteps">⌃</button>
+        <h1 id="presentationTitle">SOFIA DIGITAL TWIN</h1>
+        <div class="presentation-actions">
+          <button id="presentationPrevious" type="button" aria-label="Предишна стъпка" disabled>←</button>
+          <button type="button" aria-label="Автоматично превъртане" disabled>▶</button>
+          <button id="presentationFocus" type="button" title="Върни началния изглед на стъпката">Focus</button>
+          <button id="presentationNext" type="button" aria-label="Следваща стъпка" disabled>→</button>
+        </div>
+      </div>
+      <ol id="presentationSteps" aria-label="Стъпки на презентацията"></ol>
+    </nav>
+    <section id="wrfTimePanel" aria-labelledby="wrfTitle" hidden>
+      <div class="wrf-time-header">
+        <h2 id="wrfTitle">WRF 2024 · 2 m air temperature</h2>
+        <output id="wrfTimestamp" for="wrfHour"></output>
+      </div>
+      <div class="wrf-time-controls">
+        <button id="wrfPlay" type="button">Play</button>
+        <input id="wrfHour" type="range" min="0" max="0" step="1" value="0" aria-label="Час на прогнозата" />
+      </div>
+      <div id="wrfRamp" aria-hidden="true"></div>
+      <div class="wrf-scale"><span id="wrfMin"></span><span id="wrfMax"></span></div>
+      <div id="wrfMessage" role="status"></div>
+    </section>
+    <p id="status" role="status">Зареждат се теренът и сградите на София…</p>
+    <aside id="layerLegends" aria-label="Легенда на картата" hidden></aside>
+  </body>
+</html>
