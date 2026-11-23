@@ -102,13 +102,19 @@ export const slides = [
   { id: "building-class", layers: ["building-class"] },
 ];
 
-export async function applySlide(slide, layers, legendContainer) {
+export async function applySlide(slide, layers, legendContainer, isCurrent) {
   const activeIds = new Set(slide.layers);
-  const entries = [...layers];
+  const entries = [
+    ...[...layers].filter(([id]) => !activeIds.has(id)),
+    ...[...layers].filter(([id]) => activeIds.has(id)),
+  ];
+  legendContainer.hidden = true;
+  // Release the shared building style before applying the next one.
   const layerUpdates = entries.map(async ([id, layer]) => {
-    await layer.setVisible(activeIds.has(id));
+    await layer.setVisible(activeIds.has(id), slide);
   });
   const results = await Promise.allSettled(layerUpdates);
+  if (!isCurrent()) return [];
   const availableIds = new Set();
   const failures = [];
 

@@ -91,6 +91,7 @@ export function createLayers(Cesium, viewer, buildings, layerOptions = {}) {
 
   if (buildings) {
     const originalStyle = buildings.style;
+    const originalBlendMode = buildings.colorBlendMode;
     const conditions = buildingClasses.map(({ value, color }) => [
       `\${citygml_class_description} === '${value}'`,
       color,
@@ -101,11 +102,15 @@ export function createLayers(Cesium, viewer, buildings, layerOptions = {}) {
     layers.set("building-class", {
       title: "Building Class",
       legend: [...buildingClasses, otherClass],
-      setVisible(visible) {
+      setVisible(visible, slide) {
         if (visible) {
           buildings.style = style;
+          buildings.colorBlendMode = slide.sceneLighting === "daylight"
+            ? Cesium.Cesium3DTileColorBlendMode.REPLACE
+            : originalBlendMode;
         } else if (buildings.style === style) {
           buildings.style = originalStyle;
+          buildings.colorBlendMode = originalBlendMode;
         }
       },
     });

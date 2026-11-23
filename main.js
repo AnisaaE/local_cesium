@@ -19,8 +19,7 @@ async function start() {
 
   const params = new URLSearchParams(window.location.search);
   const slideId = params.get("slide");
-  const slide = slides.find(({ id }) => id === slideId) ?? slides[0];
-  const useDaylight = slide.sceneLighting === "daylight";
+  const initialSlide = slides.find(({ id }) => id === slideId) ?? slides[0];
 
   Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1OTdkNmE4OS0yZTVmLTQ1OTUtODNhNi1hOTVjMjAyMTU2ODUiLCJpZCI6MzI3NDAsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1OTc0MDQwNTB9.FrhV7MfxnIPM1ikW8-Z4VaGJzKxwvZk_Y-Nb7HwOWa0";
 
@@ -30,34 +29,53 @@ async function start() {
     fullscreenButton: false,
     geocoder: false,
     homeButton: false,
-    infoBox: slide.infoBox ?? false,
+    infoBox: slides.some(slide => slide.infoBox),
     navigationHelpButton: false,
     selectionIndicator: false,
     timeline: false,
     scene3DOnly: true,
-    useBrowserRecommendedResolution: slide.useBrowserRecommendedResolution ?? false,
+    useBrowserRecommendedResolution: initialSlide.useBrowserRecommendedResolution ?? false,
     requestRenderMode: true,
     maximumRenderTimeChange: Infinity,
   });
 
   viewer.scene.globe.depthTestAgainstTerrain = true;
-  viewer.scene.globe.enableLighting = slide.terrainLighting ?? false;
-  if (slide.lightingTime) {
-    viewer.clock.currentTime = Cesium.JulianDate.fromIso8601(slide.lightingTime);
-    viewer.clock.shouldAnimate = false;
-  }
-  if (useDaylight) {
-    // Use a fixed, neutral light from above and southwest of Sofia.
-    const center = Cesium.Cartesian3.fromDegrees(23.3219, 42.6977);
-    const localFrame = Cesium.Transforms.eastNorthUpToFixedFrame(center);
-    const direction = Cesium.Matrix4.multiplyByPointAsVector(
-      localFrame, new Cesium.Cartesian3(0.4, 0.6, -0.75), new Cesium.Cartesian3()
-    );
-    viewer.scene.light = new Cesium.DirectionalLight({ direction, intensity: 2.0 });
-    viewer.scene.highDynamicRange = false;
-    viewer.shadows = false;
-  }
+  const defaultLight = viewer.scene.light;
+  const defaultHdr = viewer.scene.highDynamicRange;
+  const defaultShadows = viewer.shadows;
+  const defaultTime = viewer.clock.currentTime.clone();
+  const defaultClockAnimation = viewer.clock.shouldAnimate;
+  const basemapLayers = new Map();
+  // Use a fixed, neutral light from above and southwest of Sofia.
+  const center = Cesium.Cartesian3.fromDegrees(23.3219, 42.6977);
+  const localFrame = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+  const direction = Cesium.Matrix4.multiplyByPointAsVector(
+    localFrame, new Cesium.Cartesian3(0.4, 0.6, -0.75), new Cesium.Cartesian3()
+  );
+  const daylight = new Cesium.DirectionalLight({ direction, intensity: 2.0 });
   let buildingTileset;
+  let cameraFlightId = 0;
+
+  function applySceneSettings(slide) {
+    const useDaylight = slide.sceneLighting === "daylight";
+    viewer.scene.globe.enableLighting = slide.terrainLighting ?? false;
+    viewer.scene.light = useDaylight ? daylight : defaultLight;
+    viewer.scene.highDynamicRange = useDaylight ? false : defaultHdr;
+    viewer.shadows = useDaylight ? false : defaultShadows;
+    viewer.clock.currentTime = slide.lightingTime
+      ? Cesium.JulianDate.fromIso8601(slide.lightingTime)
+      : defaultTime.clone();
+    viewer.clock.shouldAnimate = slide.lightingTime ? false : defaultClockAnimation;
+    viewer.useBrowserRecommendedResolution = slide.useBrowserRecommendedResolution ?? false;
+    if (viewer.infoBox) {
+      viewer.selectedEntity = undefined;
+      viewer.infoBox.container.style.display = slide.infoBox ? "" : "none";
+    }
+    for (const [url, layer] of basemapLayers) {
+      layer.alpha = url === slide.basemapUrl ? 1 : 0;
+    }
+    viewer.scene.requestRender();
+  }
 
   function cameraView({ longitude, latitude, height, heading, pitch, roll }) {
     return {
@@ -70,25 +88,8 @@ async function start() {
     };
   }
 
-  function focusMap() {
-    if (slide.camera) {
-      viewer.camera.setView(cameraView(slide.camera));
-    } else if (slide.bounds) {
-      viewer.camera.setView({ destination: Cesium.Rectangle.fromDegrees(...slide.bounds) });
-    } else if (buildingTileset) {
-      void viewer.flyTo(buildingTileset);
-    } else {
-      viewer.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(23.3219, 42.6977, 11000),
-      });
-    }
-    viewer.scene.requestRender();
-  }
-
-  function playCameraFlight() {
+  function playCameraFlight(slide) {
     const flight = slide.cameraFlight;
-    viewer.camera.cancelFlight();
-    focusMap();
     viewer.camera.flyTo({
       ...cameraView(flight),
       duration: flight.duration,
@@ -97,7 +98,35 @@ async function start() {
     });
   }
 
-  focusMap();
+  function focusMap(slide, duration = 1.6, playFlight = true) {
+    const id = ++cameraFlightId;
+    viewer.camera.cancelFlight();
+    const flight = {
+      duration,
+      easingFunction: Cesium.EasingFunction.SINUSOIDAL_IN_OUT,
+    };
+    if (playFlight && slide.cameraFlight) {
+      flight.complete = () => queueMicrotask(() => {
+        if (id === cameraFlightId) playCameraFlight(slide);
+      });
+    }
+    if (!slide.camera && !slide.bounds && buildingTileset) {
+      viewer.camera.flyToBoundingSphere(buildingTileset.boundingSphere, flight);
+    } else {
+      const view = slide.camera
+        ? cameraView(slide.camera)
+        : {
+          destination: slide.bounds
+            ? Cesium.Rectangle.fromDegrees(...slide.bounds)
+            : Cesium.Cartesian3.fromDegrees(23.3219, 42.6977, 11000),
+        };
+      viewer.camera.flyTo({ ...view, ...flight });
+    }
+    viewer.scene.requestRender();
+  }
+
+  applySceneSettings(initialSlide);
+  focusMap(initialSlide, 0, false);
   if (params.get("debug") === "1") showCameraDebug(Cesium, viewer);
 
   async function loadTerrain() {
@@ -112,41 +141,25 @@ async function start() {
   }
 
   async function loadBuildings() {
-    const tileset = await Cesium.Cesium3DTileset.fromUrl(buildingsUrl, {
+    return Cesium.Cesium3DTileset.fromUrl(buildingsUrl, {
       dynamicScreenSpaceError: false,
       maximumScreenSpaceError: 1,
       skipLevelOfDetail: true,
     });
-    if (useDaylight) {
-      tileset.colorBlendMode = Cesium.Cesium3DTileColorBlendMode.REPLACE;
-    }
-    return tileset;
   }
 
-  async function loadBasemap() {
-    if (!slide.basemapUrl) return;
-    const current = viewer.imageryLayers.length ? viewer.imageryLayers.get(0) : undefined;
-    const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(slide.basemapUrl, {
+  function loadImagery(url) {
+    return Cesium.ArcGisMapServerImageryProvider.fromUrl(url, {
       enablePickFeatures: false,
     });
-    viewer.imageryLayers.addImageryProvider(provider, 0);
-    if (current) viewer.imageryLayers.remove(current);
-    viewer.scene.requestRender();
   }
 
-  async function loadOrthophoto() {
-    const provider = await Cesium.ArcGisMapServerImageryProvider.fromUrl(orthophotoUrl, {
-      enablePickFeatures: false,
-    });
-    viewer.imageryLayers.addImageryProvider(provider);
-    viewer.scene.requestRender();
-  }
-
-  const [terrain, buildings, basemap, orthophoto] = await Promise.allSettled([
+  const basemapUrls = [...new Set(slides.map(slide => slide.basemapUrl).filter(Boolean))];
+  const [terrain, buildings, orthophoto, ...basemaps] = await Promise.allSettled([
     loadTerrain(),
     loadBuildings(),
-    loadBasemap(),
-    loadOrthophoto(),
+    loadImagery(orthophotoUrl),
+    ...basemapUrls.map(loadImagery),
   ]);
   const failures = [];
 
@@ -158,32 +171,56 @@ async function start() {
     console.error("Sofia buildings failed to load.", buildings.reason);
     failures.push("3D сградите на София не се заредиха.");
   }
-  if (basemap.status === "rejected") {
-    console.error("The WRF basemap failed to load.", basemap.reason);
-    failures.push("Сателитната подложка на WRF не се зареди.");
-  }
+  basemaps.forEach((result, index) => {
+    const url = basemapUrls[index];
+    if (result.status === "fulfilled") {
+      // Keep the default imagery underneath, including while tiles load.
+      const layer = viewer.imageryLayers.addImageryProvider(result.value);
+      layer.alpha = url === initialSlide.basemapUrl ? 1 : 0;
+      basemapLayers.set(url, layer);
+    } else {
+      console.error("The satellite basemap failed to load.", result.reason);
+    }
+  });
   if (orthophoto.status === "rejected") {
     console.error("Sofia orthophoto failed to load.", orthophoto.reason);
     failures.push("Ортофотото на София не се зареди.");
+  } else {
+    viewer.imageryLayers.addImageryProvider(orthophoto.value);
   }
 
   buildingTileset = buildings.value;
-  const layers = createLayers(Cesium, viewer, buildingTileset, slide.layerOptions);
-  const layerUpdates = applySlide(slide, layers, document.getElementById("layerLegends"));
   if (buildingTileset) {
     viewer.scene.primitives.add(buildingTileset);
-    if (slide.camera || slide.bounds) {
-      viewer.scene.requestRender();
-    } else {
-      focusMap();
-    }
+    if (!initialSlide.camera && !initialSlide.bounds) focusMap(initialSlide, 0);
   }
-  setupPresentation(slide, slide.cameraFlight ? playCameraFlight : focusMap);
 
-  failures.push(...await layerUpdates);
-  statusMessage.textContent = failures.join(" ");
-  statusMessage.hidden = failures.length === 0;
-  if (slide.cameraFlight) playCameraFlight();
+  const layerOptions = Object.assign({}, ...slides.map(slide => slide.layerOptions));
+  const layers = createLayers(Cesium, viewer, buildingTileset, layerOptions);
+  const legendContainer = document.getElementById("layerLegends");
+  let slideChange = 0;
+
+  async function updateSlide(slide) {
+    const id = ++slideChange;
+    const isCurrent = () => id === slideChange;
+    applySceneSettings(slide);
+    const layerFailures = await applySlide(slide, layers, legendContainer, isCurrent);
+    if (!isCurrent()) return;
+    const messages = [...failures, ...layerFailures];
+    if (slide.basemapUrl && !basemapLayers.has(slide.basemapUrl)) {
+      messages.push("Сателитната подложка не се зареди.");
+    }
+    statusMessage.textContent = messages.join(" ");
+    statusMessage.hidden = messages.length === 0;
+  }
+
+  setupPresentation(initialSlide, slide => {
+    void updateSlide(slide);
+    focusMap(slide);
+  }, focusMap);
+  const initialUpdate = updateSlide(initialSlide);
+  if (initialSlide.cameraFlight) playCameraFlight(initialSlide);
+  await initialUpdate;
 }
 
 start().catch((error) => {

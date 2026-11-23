@@ -1,15 +1,28 @@
 import { presentationSteps } from "./slides.js";
 
-export function setupPresentation(slide, focusMap) {
+export function setupPresentation(slide, onSlideChange, focusMap) {
   const panel = document.getElementById("presentation");
   const list = document.getElementById("presentationSteps");
-  const selected = presentationSteps.indexOf(slide);
-  if (selected === -1) return;
+  if (!presentationSteps.includes(slide)) return;
+  let selected = slide;
 
   function showStep(step) {
+    if (!step?.layers) return;
+    if (step === selected) {
+      focusMap(step);
+      return;
+    }
     const url = new URL(window.location.href);
     url.searchParams.set("slide", step.id);
-    window.location.assign(url);
+    window.history.pushState(null, "", url);
+    selectStep(step);
+  }
+
+  function selectStep(step) {
+    if (step === selected) return;
+    selected = step;
+    updateControls();
+    onSlideChange(step);
   }
 
   const buttons = presentationSteps.map((step, index) => {
@@ -21,19 +34,16 @@ export function setupPresentation(slide, focusMap) {
     button.type = "button";
     button.append(number, document.createTextNode(step.title));
 
-    if (step === slide) {
-      button.setAttribute("aria-current", "step");
-      button.addEventListener("click", focusMap);
-    } else if (step.layers) {
+    if (step.layers) {
       button.addEventListener("click", () => showStep(step));
     } else {
       button.disabled = true;
       button.title = "Слоевете за тази стъпка предстоят";
     }
     item.append(button);
-    return item;
+    return { item, button };
   });
-  list.replaceChildren(...buttons);
+  list.replaceChildren(...buttons.map(({ item }) => item));
 
   const collapse = document.getElementById("presentationCollapse");
   collapse.addEventListener("click", () => {
@@ -42,20 +52,30 @@ export function setupPresentation(slide, focusMap) {
     collapse.setAttribute("aria-label", list.hidden ? "Разгъни стъпките" : "Свий стъпките");
   });
 
-  for (const [control, step] of [
-    ["presentationPrevious", presentationSteps[selected - 1]],
-    ["presentationNext", presentationSteps[selected + 1]],
-  ]) {
-    if (!step?.layers) continue;
-    const button = document.getElementById(control);
-    button.disabled = false;
-    button.addEventListener("click", () => showStep(step));
-  }
+  const previous = document.getElementById("presentationPrevious");
+  const next = document.getElementById("presentationNext");
   const focusButton = document.getElementById("presentationFocus");
-  if (slide.cameraFlight) {
-    focusButton.textContent = "Replay";
-    focusButton.title = "Пусни полета отначало";
+  const focusTitle = focusButton.title;
+
+  function updateControls() {
+    const index = presentationSteps.indexOf(selected);
+    buttons.forEach(({ button }, position) => {
+      if (position === index) button.setAttribute("aria-current", "step");
+      else button.removeAttribute("aria-current");
+    });
+    previous.disabled = !presentationSteps[index - 1]?.layers;
+    next.disabled = !presentationSteps[index + 1]?.layers;
+    focusButton.textContent = selected.cameraFlight ? "Replay" : "Focus";
+    focusButton.title = selected.cameraFlight ? "Пусни полета отначало" : focusTitle;
   }
-  focusButton.addEventListener("click", focusMap);
+
+  previous.addEventListener("click", () => showStep(presentationSteps[presentationSteps.indexOf(selected) - 1]));
+  next.addEventListener("click", () => showStep(presentationSteps[presentationSteps.indexOf(selected) + 1]));
+  focusButton.addEventListener("click", () => focusMap(selected));
+  window.addEventListener("popstate", () => {
+    const id = new URL(window.location.href).searchParams.get("slide");
+    selectStep(presentationSteps.find(step => step.id === id && step.layers) ?? presentationSteps[0]);
+  });
+  updateControls();
   panel.hidden = false;
 }

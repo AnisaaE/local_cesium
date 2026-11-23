@@ -4,6 +4,7 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
   const manifestUrl = new URL(options.manifest ?? defaultManifestUrl, import.meta.url);
   const images = new Map();
   let manifest;
+  let initializing;
   let tilingScheme;
   let panel;
   let range;
@@ -15,6 +16,7 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
   let index = -1;
   let requestId = 0;
   let visible = false;
+  let visibilityId = 0;
   let playing = false;
   let timer;
 
@@ -148,6 +150,7 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
   return {
     title: "WRF 2 m air temperature",
     async setVisible(nextVisible) {
+      const id = ++visibilityId;
       visible = nextVisible;
       if (!visible) {
         if (!panel) return;
@@ -156,13 +159,20 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
         if (previousLayer) viewer.imageryLayers.remove(previousLayer);
         if (layer) viewer.imageryLayers.remove(layer);
         previousLayer = layer = undefined;
+        index = -1;
         panel.hidden = true;
         viewer.scene.requestRender();
         return;
       }
-      if (!manifest) await initialize();
-      if (visible && await display(Math.max(0, index))) panel.hidden = false;
-      else if (visible) throw new Error("The initial WRF frame failed to load.");
+      if (!manifest) {
+        initializing ??= initialize().finally(() => { initializing = undefined; });
+        await initializing;
+      }
+      if (id !== visibilityId) return;
+      const displayed = await display(Math.max(0, index));
+      if (id !== visibilityId) return;
+      if (!displayed) throw new Error("The initial WRF frame failed to load.");
+      panel.hidden = false;
     },
   };
 }

@@ -128,8 +128,10 @@ export function createWalkabilityLayer(Cesium, viewer, buildings) {
   const fallback = Cesium.Color.fromBytes(...neutral);
   const last = stops.length - 1;
   let lookup;
+  let loading;
   let previousStyle;
   let previousBlend;
+  let visible = false;
   let active = false;
   const style = new Cesium.Cesium3DTileStyle();
   style.color = {
@@ -149,14 +151,20 @@ export function createWalkabilityLayer(Cesium, viewer, buildings) {
   return {
     title: "Walkability Buildings",
     legend,
-    async setVisible(visible) {
+    async setVisible(nextVisible) {
+      visible = nextVisible;
+      if (visible && !lookup) {
+        loading ??= fetch(walkabilityUrl)
+          .then(response => {
+            if (!response.ok) throw new Error(`Walkability data returned HTTP ${response.status}.`);
+            return response.json();
+          })
+          .then(data => { lookup = new Map(Object.entries(data)); })
+          .finally(() => { loading = undefined; });
+        await loading;
+      }
       if (visible === active) return;
       if (visible) {
-        if (!lookup) {
-          const response = await fetch(walkabilityUrl);
-          if (!response.ok) throw new Error(`Walkability data returned HTTP ${response.status}.`);
-          lookup = new Map(Object.entries(await response.json()));
-        }
         previousStyle = buildings.style;
         previousBlend = buildings.colorBlendMode;
         buildings.colorBlendMode = Cesium.Cesium3DTileColorBlendMode.REPLACE;
