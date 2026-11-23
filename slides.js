@@ -1,4 +1,6 @@
 const districtBounds = [23.02, 42.39, 23.71, 42.92];
+const sensorLayerIds = ["air", "lidar", "noise", "pedestrian"];
+const solarSlideLayers = ["trees", "solar-radiation", ...sensorLayerIds];
 const overviewCamera = {
   longitude: 23.3312323316,
   latitude: 42.5594255987,
@@ -12,7 +14,7 @@ export const presentationSteps = [
   {
     id: "data-methods-platforms",
     title: "Data, Methods, Platforms",
-    layers: ["districts", "building-class", "air", "lidar", "noise", "pedestrian"],
+    layers: ["districts", "building-class", ...sensorLayerIds],
     camera: overviewCamera,
   },
   {
@@ -87,7 +89,20 @@ export const presentationSteps = [
       duration: 8,
     },
   },
-  { id: "solar-radiation", title: "Solar radiation on building facades and streets" },
+  {
+    id: "solar-radiation",
+    title: "Solar radiation on building facades and streets",
+    layers: solarSlideLayers,
+    layerControls: solarSlideLayers,
+    camera: {
+      longitude: 23.325,
+      latitude: 42.659,
+      height: 5500,
+      heading: 0,
+      pitch: -78,
+      roll: 0,
+    },
+  },
   { id: "cfd", title: "Detailed geometry and CFD analysis" },
 ];
 
@@ -98,7 +113,7 @@ export const slides = [
   { id: "lidar", layers: ["lidar"] },
   { id: "noise", layers: ["noise"] },
   { id: "pedestrian", layers: ["pedestrian"] },
-  { id: "sensors", layers: ["air", "lidar", "noise", "pedestrian"] },
+  { id: "sensors", layers: sensorLayerIds },
   { id: "building-class", layers: ["building-class"] },
 ];
 

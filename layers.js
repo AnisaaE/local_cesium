@@ -6,6 +6,8 @@ import { createWrfLayer } from "./wrf.js";
 
 const labSensorsUrl =
   "https://services-eu1.arcgis.com/XYGfXK4rEYwaj5A0/arcgis/rest/services/LabSensors/FeatureServer";
+const treesUrl =
+  "https://raw.githubusercontent.com/eshirinyan/three_sample/refs/heads/main/sp_sofia_trees_i3dm_20250818_glb/tileset.json";
 
 const sensorLayers = [
   { id: "air", serviceId: 3, title: "Air", label: "Станция за качество на въздуха" },
@@ -45,6 +47,12 @@ export function createLayers(Cesium, viewer, buildings, layerOptions = {}) {
     load: () => loadTemperature(Cesium, viewer.clock.currentTime, layerOptions["temperature-prediction"]),
   }));
   layers.set("wrf-temperature", createWrfLayer(Cesium, viewer, layerOptions["wrf-temperature"]));
+  layers.set("trees", createSceneLayer({
+    title: "Trees",
+    load: () => Cesium.Cesium3DTileset.fromUrl(treesUrl),
+    add: tileset => viewer.scene.primitives.add(tileset),
+    requestRender: () => viewer.scene.requestRender(),
+  }));
   for (const config of educationLayers) {
     layers.set(config.id, createDataSourceLayer(viewer, {
       title: config.title,
