@@ -1,6 +1,7 @@
 const districtBounds = [23.02, 42.39, 23.71, 42.92];
 const sensorLayerIds = ["air", "lidar", "noise", "pedestrian"];
 const solarSlideLayers = ["trees", "solar-radiation", ...sensorLayerIds];
+const cfdSlideLayers = ["gate-cfd", "gate-building"];
 const overviewCamera = {
   longitude: 23.3312323316,
   latitude: 42.5594255987,
@@ -149,7 +150,17 @@ Analysis of 27 611 apartment buildings in Sofia:
   {
     id: "cfd",
     title: "Detailed geometry and CFD analysis",
-    layers: [],
+    layers: cfdSlideLayers,
+    layerControls: cfdSlideLayers,
+    sceneLighting: "daylight",
+    camera: {
+      longitude: 23.32914,
+      latitude: 42.67205,
+      height: 825,
+      heading: 29.987,
+      pitch: -41.422,
+      roll: 0,
+    },
     info: {
       text: "Computational Fluid Dynamics (CFD) analysis for the GATE building.",
       images: [{

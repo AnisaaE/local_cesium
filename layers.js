@@ -1,4 +1,5 @@
 import { loadDistricts } from "./districts.js";
+import { cfdVelocityLegend, loadCfdPoints, loadGateBuilding } from "./gate-cfd.js";
 import { createHeatingDemandLayer } from "./heating-demand.js";
 import { loadTemperature, temperatureLegend, temperatureTitle } from "./temperature.js";
 import { createWalkabilityLayer, createWalkAccessLayer, createWalkRasterProvider, educationLayers, loadEducationPoints, walkRasters } from "./walkability.js";
@@ -45,6 +46,32 @@ export function createLayers(Cesium, viewer, buildings, layerOptions = {}) {
     title: temperatureTitle,
     legend: temperatureLegend,
     load: () => loadTemperature(Cesium, viewer.clock.currentTime, layerOptions["temperature-prediction"]),
+  }));
+  layers.set("gate-cfd", createSceneLayer({
+    title: "CFD air speed",
+    legend: cfdVelocityLegend,
+    load: () => loadCfdPoints(Cesium),
+    add: points => viewer.scene.primitives.add(points),
+    requestRender: () => viewer.scene.requestRender(),
+  }));
+  const cityWithoutGate = buildings && new Cesium.Cesium3DTileStyle({
+    show: "${cadnum} !== '68134.902.781.31'",
+  });
+  let cityStyleBeforeGate;
+  layers.set("gate-building", createSceneLayer({
+    title: "GATE 3D building",
+    load: () => loadGateBuilding(Cesium),
+    add: model => viewer.scene.primitives.add(model),
+    onVisibilityChange(visible) {
+      if (!buildings) return;
+      if (visible && buildings.style !== cityWithoutGate) {
+        cityStyleBeforeGate = buildings.style;
+        buildings.style = cityWithoutGate;
+      } else if (!visible && buildings.style === cityWithoutGate) {
+        buildings.style = cityStyleBeforeGate;
+      }
+    },
+    requestRender: () => viewer.scene.requestRender(),
   }));
   layers.set("wrf-temperature", createWrfLayer(Cesium, viewer, layerOptions["wrf-temperature"]));
   layers.set("trees", createSceneLayer({
@@ -192,7 +219,7 @@ function createDataSourceLayer(viewer, { title, legend, load }) {
   });
 }
 
-function createSceneLayer({ title, legend, load, add, requestRender }) {
+function createSceneLayer({ title, legend, load, add, onVisibilityChange, requestRender }) {
   let object;
   let loading;
   let visible = false;
@@ -215,6 +242,7 @@ function createSceneLayer({ title, legend, load, add, requestRender }) {
       }
       if (object) {
         object.show = visible;
+        onVisibilityChange?.(visible);
         requestRender();
       }
     },
