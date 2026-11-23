@@ -3,5 +3,6 @@
   "title": "2 m air temperature",
   "range": [9.881683349609375, 38.104248046875],
   "colors": ["#0000ff", "#00ffff", "#ffff00", "#ff0000"],
-  "interpolation": "lab"
+  "interpolation": "lab",
+  "samplePoint": { "latitude": 42.6853, "longitude": 23.3190 }
 }

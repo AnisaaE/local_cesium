@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 435" role="img" aria-labelledby="title desc" font-family="Segoe UI, Arial, sans-serif">
+<title id="title">Lozenets space heating by construction year</title><desc id="desc">Hourly profiles for an average winter day, December to February. Sample sizes appear in parentheses.</desc>
+<rect width="100%" height="100%" rx="16" fill="#f7fafc"/>
+<text x="24" y="38" font-size="25" font-weight="700" fill="#172532">Construction year</text>
+<text x="24" y="65" font-size="16" fill="#425568">Average winter day · Dec–Feb</text>
+<text x="62" y="87" font-size="15" fill="#425568">Space heating (Wh/m²/h)</text>
+<path d="M62 290H522" stroke="#ccd6e0"/><text x="52" y="295" text-anchor="end" font-size="15" fill="#425568">0</text>
+<path d="M62 242.5H522" stroke="#ccd6e0"/><text x="52" y="247.5" text-anchor="end" font-size="15" fill="#425568">15</text>
+<path d="M62 195H522" stroke="#ccd6e0"/><text x="52" y="200" text-anchor="end" font-size="15" fill="#425568">30</text>
+<path d="M62 147.5H522" stroke="#ccd6e0"/><text x="52" y="152.5" text-anchor="end" font-size="15" fill="#425568">45</text>
+<path d="M62 100H522" stroke="#ccd6e0"/><text x="52" y="105" text-anchor="end" font-size="15" fill="#425568">60</text>
+<text x="62" y="313" text-anchor="middle" font-size="15" fill="#425568">00</text>
+<text x="142" y="313" text-anchor="middle" font-size="15" fill="#425568">04</text>
+<text x="222" y="313" text-anchor="middle" font-size="15" fill="#425568">08</text>
+<text x="302" y="313" text-anchor="middle" font-size="15" fill="#425568">12</text>
+<text x="382" y="313" text-anchor="middle" font-size="15" fill="#425568">16</text>
+<text x="462" y="313" text-anchor="middle" font-size="15" fill="#425568">20</text>
+<text x="522" y="313" text-anchor="middle" font-size="15" fill="#425568">23</text>
+<text x="292" y="338" text-anchor="middle" font-size="15" fill="#425568">Hour of day</text>
+<polyline points="62,169.39 82,162.41 102,158.45 122,154.66 142,154.44 162,153.45 182,153.15 202,150.19 222,142.79 242,152.99 262,168.37 282,183.63 302,190.93 322,193.70 342,194.92 362,195.36 382,191.35 402,186.88 422,184.14 442,181.32 462,178.32 482,171.67 502,172.49 522,175.10" fill="none" stroke="#00758a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28 355h22" stroke="#00758a" stroke-width="4" stroke-linecap="round"/><text x="60" y="360" fill="#172532" font-size="17">Before 1919 (5)</text>
+<polyline points="62,155.13 82,147.68 102,143.35 122,139.18 142,138.66 162,137.41 182,136.78 202,133.73 222,126.55 242,137.44 262,153.99 282,169.41 302,182.37 322,187.78 342,189.45 362,188.48 382,182.81 402,176.52 422,173.21 442,169.64 462,165.94 482,158.91 502,159.18 522,161.28" fill="none" stroke="#a64807" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M288 355h22" stroke="#a64807" stroke-width="4" stroke-linecap="round"/><text x="320" y="360" fill="#172532" font-size="17">1919–1930 (83)</text>
+<polyline points="62,210.40 82,203.71 102,199.48 122,196.15 142,196.12 162,194.81 182,195.03 202,191.96 222,184.54 242,196.14 262,211.85 282,225.74 302,234.92 322,239.14 342,241.06 362,239.26 382,232.72 402,227.06 422,224.02 442,221.54 462,218.73 482,212.03 502,213.15 522,215.64" fill="none" stroke="#487415" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28 381h22" stroke="#487415" stroke-width="4" stroke-linecap="round"/><text x="60" y="386" fill="#172532" font-size="17">1930–1960 (609)</text>
+<polyline points="62,245.81 82,240.14 102,236.73 122,234.25 142,234.90 162,234.20 182,235.12 202,232.37 222,224.59 242,231.44 262,241.79 282,251.54 302,257.37 322,260.10 342,261.95 362,261.67 382,257.90 402,254.72 422,252.68 442,251.46 462,250.08 482,244.25 502,246.53 522,250.09" fill="none" stroke="#9b3d78" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M288 381h22" stroke="#9b3d78" stroke-width="4" stroke-linecap="round"/><text x="320" y="386" fill="#172532" font-size="17">1960–1999 (1,133)</text>
+<polyline points="62,281.18 82,277.40 102,275.08 122,273.26 142,273.80 162,273.37 182,274.17 202,271.79 222,264.89 242,270.68 262,277.86 282,283.10 302,285.01 322,285.67 342,286.16 362,286.06 382,284.68 402,283.78 422,283.06 442,283.08 462,282.72 482,279.14 502,281.09 522,283.70" fill="none" stroke="#554eb4" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M28 407h22" stroke="#554eb4" stroke-width="4" stroke-linecap="round"/><text x="60" y="412" fill="#172532" font-size="17">1999–2009 (458)</text>
+<polyline points="62,285.75 82,283.24 102,281.67 122,280.42 142,280.76 162,280.45 182,281.03 202,279.33 222,273.85 242,278.72 262,283.88 282,287.03 302,287.96 322,288.20 342,288.50 362,288.49 382,287.60 402,287.05 422,286.68 442,286.84 462,286.58 482,284.35 502,285.67 522,287.25" fill="none" stroke="#665647" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M288 407h22" stroke="#665647" stroke-width="4" stroke-linecap="round"/><text x="320" y="412" fill="#172532" font-size="17">After 2009 (81)</text>
+</svg>

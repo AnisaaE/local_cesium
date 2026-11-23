@@ -24,20 +24,40 @@
       </div>
       <ol id="presentationSteps" aria-label="Стъпки на презентацията"></ol>
     </nav>
-    <section id="wrfTimePanel" aria-labelledby="wrfTitle" hidden>
-      <div class="wrf-time-header">
-        <h2 id="wrfTitle">WRF 2024 · 2 m air temperature</h2>
-        <output id="wrfTimestamp" for="wrfHour"></output>
-      </div>
-      <div class="wrf-time-controls">
-        <button id="wrfPlay" type="button">Play</button>
-        <input id="wrfHour" type="range" min="0" max="0" step="1" value="0" aria-label="Час на прогнозата" />
-      </div>
-      <div id="wrfRamp" aria-hidden="true"></div>
-      <div class="wrf-scale"><span id="wrfMin"></span><span id="wrfMax"></span></div>
-      <div id="wrfMessage" role="status"></div>
-    </section>
     <p id="status" role="status">Зареждат се теренът и сградите на София…</p>
+    <div id="slidePanels">
+      <aside id="slideInfo" aria-labelledby="slideInfoTitle" tabindex="0" hidden>
+        <h2 id="slideInfoTitle"></h2>
+        <div id="slideInfoContent"></div>
+        <div id="wrfChart" hidden>
+          <p id="wrfChartSample"></p>
+          <svg viewBox="0 0 340 164" role="img" aria-labelledby="wrfChartTitle">
+            <title id="wrfChartTitle">Hourly modeled air temperature at the sample point</title>
+            <path class="wrf-chart-grid" d="M42 14H328 M42 138H328" />
+            <text id="wrfChartMax" x="34" y="18" text-anchor="end"></text>
+            <text id="wrfChartMin" x="34" y="142" text-anchor="end"></text>
+            <text id="wrfChartStart" x="42" y="157"></text>
+            <text id="wrfChartEnd" x="328" y="157" text-anchor="end"></text>
+            <path id="wrfChartSeries" />
+            <line id="wrfChartCursor" x1="0" x2="0" y1="14" y2="138" />
+          </svg>
+          <p id="wrfChartTemperature"></p>
+        </div>
+      </aside>
+      <section id="wrfTimePanel" aria-labelledby="wrfTitle" hidden>
+        <div class="wrf-time-header">
+          <h2 id="wrfTitle">WRF 2024 · 2 m air temperature</h2>
+          <output id="wrfTimestamp" for="wrfHour"></output>
+        </div>
+        <div class="wrf-time-controls">
+          <button id="wrfPlay" type="button">Play</button>
+          <input id="wrfHour" type="range" min="0" max="0" step="1" value="0" aria-label="Час на прогнозата" />
+        </div>
+        <div id="wrfRamp" aria-hidden="true"></div>
+        <div class="wrf-scale"><span id="wrfMin"></span><span id="wrfMax"></span></div>
+        <div id="wrfMessage" role="status"></div>
+      </section>
+    </div>
     <aside id="layerLegends" aria-label="Легенда на картата" hidden></aside>
   </body>
 </html>

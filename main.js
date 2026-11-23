@@ -198,11 +198,58 @@ async function start() {
   const layerOptions = Object.assign({}, ...slides.map(slide => slide.layerOptions));
   const layers = createLayers(Cesium, viewer, buildingTileset, layerOptions);
   const legendContainer = document.getElementById("layerLegends");
+  const slideInfo = document.getElementById("slideInfo");
+  const slideInfoTitle = document.getElementById("slideInfoTitle");
+  const slideInfoContent = document.getElementById("slideInfoContent");
   let slideChange = 0;
+
+  function updateSlideInfo(slide) {
+    const info = slide.info;
+    slideInfo.hidden = !info;
+    if (!info) return;
+
+    const content = [];
+    if (info.text) {
+      const text = document.createElement("p");
+      text.textContent = info.text;
+      content.push(text);
+    }
+    if (info.bullets?.length) {
+      const list = document.createElement("ul");
+      for (const bullet of info.bullets) {
+        const item = document.createElement("li");
+        item.textContent = bullet;
+        list.append(item);
+      }
+      content.push(list);
+    }
+    for (const { src, width, height, alt, fullSizeLink } of info.images ?? []) {
+      const image = document.createElement("img");
+      image.width = width;
+      image.height = height;
+      image.alt = alt;
+      image.src = new URL(src, import.meta.url).href;
+      if (fullSizeLink) {
+        const link = document.createElement("a");
+        link.href = image.src;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.setAttribute("aria-label", fullSizeLink);
+        link.append(image);
+        content.push(link);
+      } else {
+        content.push(image);
+      }
+    }
+    slideInfoTitle.textContent = slide.title;
+    slideInfoContent.replaceChildren(...content);
+    slideInfo.scrollTop = 0;
+  }
 
   async function updateSlide(slide) {
     const id = ++slideChange;
     const isCurrent = () => id === slideChange;
+    updateSlideInfo(slide);
     applySceneSettings(slide);
     const layerFailures = await applySlide(slide, layers, legendContainer, isCurrent);
     if (!isCurrent()) return;

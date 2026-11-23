@@ -38,12 +38,19 @@ try {
     return [r, g, b].map(channel => Math.round(Math.min(1, Math.max(0, channel)) * 255));
   });
   const frames = [];
+  const samplePoint = config.samplePoint;
+  const sampleCell = samplePoint && getSampleCell(samplePoint, grid, width, height);
+  const sampleValues = [];
   await mkdir(join(output, "frames"), { recursive: true });
 
   for (const [index, timestamp] of times.entries()) {
     const values = dataset.slice([[index, index + 1], [], []]);
     if (values.length !== width * height) {
       throw new Error(`Invalid grid size at ${timestamp}.`);
+    }
+    if (samplePoint) {
+      const value = values[sampleCell];
+      sampleValues.push(Number.isFinite(value) && value !== fillValue ? Number(value.toFixed(2)) : null);
     }
     const image = new PNG({ width, height });
     let noData = 0;
@@ -72,10 +79,26 @@ try {
     style: { range: config.range, colors: config.colors, interpolation: config.interpolation },
     frames,
   };
+  if (samplePoint) manifest.sample = { ...samplePoint, values: sampleValues };
   await writeFile(join(output, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
   console.log(`Exported ${frames.length} ${width}×${height} frames for ${config.variable}.`);
 } finally {
   source.close();
+}
+
+function getSampleCell({ latitude, longitude }, grid, width, height) {
+  const earthRadius = 6378137;
+  const radians = Math.PI / 180;
+  const projectedX = earthRadius * longitude * radians;
+  const projectedY = earthRadius * Math.asinh(Math.tan(latitude * radians));
+  const [left, dx, , top, , dy] = grid.geoTransform;
+  const column = Math.floor((projectedX - left) / dx);
+  const row = Math.floor((projectedY - top) / dy);
+  if (!Number.isFinite(row) || !Number.isFinite(column) ||
+      Math.abs(latitude) > 85.05113 || row < 0 || row >= height || column < 0 || column >= width) {
+    throw new Error("The WRF sample point is outside the raster grid.");
+  }
+  return row * width + column;
 }
 
 function readGrid(file, x, y) {

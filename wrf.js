@@ -7,6 +7,8 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
   let initializing;
   let tilingScheme;
   let panel;
+  let chart;
+  let updateChart;
   let range;
   let timestamp;
   let playButton;
@@ -32,6 +34,8 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
     });
 
     panel = document.getElementById("wrfTimePanel");
+    chart = document.getElementById("wrfChart");
+    updateChart = prepareWrfChart(data);
     range = document.getElementById("wrfHour");
     timestamp = document.getElementById("wrfTimestamp");
     playButton = document.getElementById("wrfPlay");
@@ -39,7 +43,9 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
     range.max = data.frames.length - 1;
     range.addEventListener("input", () => {
       setPlaying(false);
-      void display(Number(range.value));
+      const frameIndex = Number(range.value);
+      updateChart?.(frameIndex);
+      void display(frameIndex);
     });
     playButton.addEventListener("click", () => setPlaying(!playing));
     window.addEventListener("pagehide", () => setPlaying(false));
@@ -111,6 +117,7 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
       if (previousLayer) retirePreviousAfterRender(previousLayer);
       index = frameIndex;
       range.value = frameIndex;
+      updateChart?.(frameIndex);
       const time = manifest.frames[frameIndex].timestamp.replace("T", " ").slice(0, 16) + " UTC";
       timestamp.textContent = time;
       range.setAttribute("aria-valuetext", time);
@@ -121,7 +128,10 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
     } catch (error) {
       if (!visible || id !== requestId) return false;
       console.error("WRF frame failed to load.", error);
-      if (index >= 0) range.value = index;
+      if (index >= 0) {
+        range.value = index;
+        updateChart?.(index);
+      }
       message.textContent = "Температурният кадър не се зареди.";
       setPlaying(false);
       return false;
@@ -161,6 +171,7 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
         previousLayer = layer = undefined;
         index = -1;
         panel.hidden = true;
+        chart.hidden = true;
         viewer.scene.requestRender();
         return;
       }
@@ -173,6 +184,42 @@ export function createWrfLayer(Cesium, viewer, options = {}) {
       if (id !== visibilityId) return;
       if (!displayed) throw new Error("The initial WRF frame failed to load.");
       panel.hidden = false;
+      chart.hidden = !updateChart;
     },
+  };
+}
+
+function prepareWrfChart({ sample, frames }) {
+  const values = sample?.values;
+  if (values?.length !== frames.length || frames.length < 2) return;
+  const valid = values.filter(Number.isFinite);
+  if (!valid.length) return;
+
+  const min = Math.floor(Math.min(...valid));
+  const max = Math.max(min + 1, Math.ceil(Math.max(...valid)));
+  const x = index => 42 + 286 * index / (frames.length - 1);
+  const y = value => 138 - 124 * (value - min) / (max - min);
+  const path = values.map((value, index) => {
+    if (!Number.isFinite(value)) return "";
+    const command = Number.isFinite(values[index - 1]) ? "L" : "M";
+    return `${command}${x(index).toFixed(2)} ${y(value).toFixed(2)}`;
+  }).join(" ");
+
+  document.getElementById("wrfChartSample").textContent =
+    `${valid.length} / ${frames.length} hours · ${sample.latitude.toFixed(4)}, ${sample.longitude.toFixed(4)}`;
+  document.getElementById("wrfChartMin").textContent = `${min}°C`;
+  document.getElementById("wrfChartMax").textContent = `${max}°C`;
+  document.getElementById("wrfChartStart").textContent = frames[0].timestamp.slice(5, 10);
+  document.getElementById("wrfChartEnd").textContent = frames.at(-1).timestamp.slice(5, 10);
+  document.getElementById("wrfChartSeries").setAttribute("d", path);
+
+  const cursor = document.getElementById("wrfChartCursor");
+  const temperature = document.getElementById("wrfChartTemperature");
+  return index => {
+    cursor.setAttribute("transform", `translate(${x(index)} 0)`);
+    const value = values[index];
+    temperature.textContent = Number.isFinite(value)
+      ? `${value.toFixed(1)} °C at slider time`
+      : "No temperature data at this time.";
   };
 }

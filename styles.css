@@ -59,6 +59,118 @@ body {
   font-size: 0.875rem;
 }
 
+#slidePanels {
+  position: fixed;
+  bottom: 2.25rem;
+  left: 0.75rem;
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  width: min(30rem, calc(100% - 1.5rem));
+  pointer-events: none;
+}
+
+#slidePanels > * {
+  pointer-events: auto;
+}
+
+#slideInfo {
+  width: min(23.25rem, 100%);
+  max-height: 45vh;
+  box-sizing: border-box;
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin-bottom: clamp(0rem, calc(12vh - 2.25rem), 4rem);
+  padding: 0.8rem;
+  border: 1px solid #44525e;
+  border-radius: 0.75rem;
+  background: rgb(16 24 32 / 94%);
+  box-shadow: 0 0.5rem 2rem rgb(4 10 16 / 35%);
+  backdrop-filter: blur(12px);
+}
+
+#slideInfo:has(+ #wrfTimePanel:not([hidden])) {
+  margin-bottom: 0;
+}
+
+#slideInfo h2 {
+  margin: 0 0 0.65rem;
+  color: #aff1df;
+  font-size: 1rem;
+}
+
+#slideInfoContent {
+  display: grid;
+  gap: 0.65rem;
+}
+
+#slideInfoContent p,
+#slideInfoContent ul {
+  margin: 0;
+}
+
+#slideInfoContent p {
+  white-space: pre-line;
+}
+
+#slideInfoContent ul {
+  padding-left: 1.2rem;
+}
+
+#slideInfoContent li + li {
+  margin-top: 0.35rem;
+}
+
+#slideInfo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  border: 1px solid #44525e;
+  border-radius: 0.55rem;
+}
+
+#wrfChart {
+  margin-top: 0.65rem;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+#wrfChart p {
+  margin: 0;
+}
+
+#wrfChart svg {
+  display: block;
+  width: 100%;
+  margin: 0.3rem 0;
+  font-size: 12px;
+}
+
+#wrfChart text {
+  fill: currentColor;
+}
+
+.wrf-chart-grid,
+#wrfChartSeries,
+#wrfChartCursor {
+  fill: none;
+}
+
+.wrf-chart-grid {
+  stroke: #54616a;
+}
+
+#wrfChartSeries {
+  stroke: #54b4ff;
+  stroke-width: 1.8;
+}
+
+#wrfChartCursor {
+  stroke: #e7f3ff;
+  stroke-width: 1.25;
+}
+
 #layerLegends details {
   padding: 0.6rem 0.8rem;
 }
@@ -236,10 +348,7 @@ body {
 }
 
 #wrfTimePanel {
-  position: fixed;
-  bottom: 2.25rem;
-  left: 0.75rem;
-  width: min(30rem, calc(100% - 1.5rem));
+  width: 100%;
   box-sizing: border-box;
   padding: 0.65rem 0.75rem;
   border: 1px solid #44525e;
@@ -306,5 +415,18 @@ body {
 
   #layerLegends {
     max-height: 30vh;
+  }
+
+  #slideInfo {
+    margin-bottom: calc(0.5rem + 22vh);
+    max-height: 24vh;
+  }
+
+  #slideInfo:has(+ #wrfTimePanel:not([hidden])) {
+    max-height: 32vh;
+  }
+
+  #slidePanels:has(#slideInfo:not([hidden])) + #layerLegends {
+    max-height: 22vh;
   }
 }

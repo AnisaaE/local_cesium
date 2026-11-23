@@ -16,6 +16,14 @@ export const presentationSteps = [
     title: "Data, Methods, Platforms",
     layers: ["districts", "building-class", ...sensorLayerIds],
     camera: overviewCamera,
+    info: {
+      images: [{
+        src: "./assets/slide-info/data-methods-platforms.png",
+        width: 334,
+        height: 279,
+        alt: "GATE · Future Cities. Схема на връзките между данните за София, моделите, сензорите и анализите. Пунктираната линия показва предложена проверка със сензори.",
+      }],
+    },
   },
   {
     id: "urban-heat-island",
@@ -24,10 +32,14 @@ export const presentationSteps = [
     layerOptions: { "temperature-prediction": { opacity: 0.50 } },
     sceneLighting: "daylight",
     camera: overviewCamera,
+    info: {
+      text: "Represents the urban heat island effect at 9 pm on 22 August 2018, with detailed visualization of heat distribution. The study proposes an approach for performing climate simulations using WRF and integration of the results within the Urban Digital Twin of Sofia.",
+    },
   },
   {
     id: "wrf-temperature",
     title: "WRF 2024 air temperature 2m: 14–22 July 2024",
+    info: { text: "Watch modeled air temperature change over time." },
     layers: ["wrf-temperature"],
     layerOptions: { "wrf-temperature": { frameDurationMs: 500 } },
     basemapUrl: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
@@ -47,12 +59,35 @@ export const presentationSteps = [
     id: "heating-demand",
     title: "CEA Modeled Energy for Heating Demand",
     layers: ["heating-demand"],
+    info: {
+      text: "Building archetypes from TABULA/Episcope",
+      bullets: [
+        "Windows-to-Wall Ratio (WWR) from regulations and building class and period",
+        "HVAC systems: 70/50 radiators and split AC units",
+        "Heating and cooling seasons",
+        "Assemblies: thermal properties of walls, roofs and windows from TABULA, ISO 9288, EN ISO 10456, EN 1252 and the Honeybee-energy materials library",
+      ],
+      images: [
+        { src: "./assets/slide-info/cea-winter-bytype.svg", width: 560, height: 383, alt: "Lozenets space heating by building type on an average winter day." },
+        { src: "./assets/slide-info/cea-winter-byyear.svg", width: 560, height: 435, alt: "Lozenets space heating by construction year on an average winter day." },
+      ],
+    },
   },
   {
     id: "15-minute-city",
     title: "15 minute city and Heat stress",
     layers: ["walkability-buildings", "heat-stress", "schools", "kindergartens", "solar-radiation"],
     layerControls: ["heat-stress", "schools", "kindergartens", "walkability-buildings", "solar-radiation"],
+    info: {
+      text: "Shows pedestrian accessibility and walkability levels across the urban environment. Residential buildings are analyzed based on the Proximity, Diversity and Richness of urban functions. Higher values indicate better access conditions; lower values mark areas with poorer walking accessibility.",
+      images: [{
+        src: "./assets/slide-info/walkability-methodology.png",
+        width: 3549,
+        height: 2437,
+        alt: "Walkability analysis workflow for Lozenets, from data collection and points of interest to accessibility and diversity indices.",
+        fullSizeLink: "Open the walkability workflow diagram in full size",
+      }],
+    },
     infoBox: true,
     basemapUrl: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
     terrainLighting: true,
@@ -71,6 +106,7 @@ export const presentationSteps = [
     id: "vitosha-views",
     title: "Views toward Vitosha Mountain",
     layers: ["walk-access"],
+    info: { text: "300 m lateral pass over Sofia." },
     camera: {
       longitude: 23.2903206,
       latitude: 42.7276907,
@@ -94,6 +130,13 @@ export const presentationSteps = [
     title: "Solar radiation on building facades and streets",
     layers: solarSlideLayers,
     layerControls: solarSlideLayers,
+    info: {
+      text: `Solar access according EN 17037:2018+A1:2021
+
+Analysis of 27 611 apartment buildings in Sofia:
+2417 have direct solar access for 2 hours and less (21 march)
+550 buildings have > 8 hours (potential overheating).`,
+    },
     camera: {
       longitude: 23.325,
       latitude: 42.659,
@@ -103,7 +146,20 @@ export const presentationSteps = [
       roll: 0,
     },
   },
-  { id: "cfd", title: "Detailed geometry and CFD analysis" },
+  {
+    id: "cfd",
+    title: "Detailed geometry and CFD analysis",
+    layers: [],
+    info: {
+      text: "Computational Fluid Dynamics (CFD) analysis for the GATE building.",
+      images: [{
+        src: "./assets/slide-info/gate-cfd-analysis.png",
+        width: 498,
+        height: 239,
+        alt: "GATE building CFD workflow showing the city model, geometry preparation, meshing and wind simulation results.",
+      }],
+    },
+  },
 ];
 
 export const slides = [
