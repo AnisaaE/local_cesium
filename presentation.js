@@ -56,6 +56,8 @@ export function setupPresentation(slide, onSlideChange, focusMap) {
   const next = document.getElementById("presentationNext");
   const focusButton = document.getElementById("presentationFocus");
   const focusTitle = focusButton.title;
+  previous.setAttribute("aria-keyshortcuts", "ArrowLeft");
+  next.setAttribute("aria-keyshortcuts", "ArrowRight");
 
   function updateControls() {
     const index = presentationSteps.indexOf(selected);
@@ -71,6 +73,15 @@ export function setupPresentation(slide, onSlideChange, focusMap) {
 
   previous.addEventListener("click", () => showStep(presentationSteps[presentationSteps.indexOf(selected) - 1]));
   next.addEventListener("click", () => showStep(presentationSteps[presentationSteps.indexOf(selected) + 1]));
+  window.addEventListener("keydown", event => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (event.target?.isContentEditable || event.target?.closest?.("input, textarea, select")) return;
+
+    const control = event.key === "ArrowLeft" ? previous : event.key === "ArrowRight" ? next : undefined;
+    if (!control || control.disabled) return;
+    event.preventDefault();
+    if (!event.repeat) control.click();
+  });
   focusButton.addEventListener("click", () => focusMap(selected));
   window.addEventListener("popstate", () => {
     const id = new URL(window.location.href).searchParams.get("slide");
